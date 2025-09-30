@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Let's read a book!</title>
+
+  <style>
+@font-face {
+  font-family: 'Cafe24NyangiWhite';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-1@1.0/Cafe24Nyangi-W-v1.0.woff2') format('woff2');
+  font-weight: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MapoFlowerIsland';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/MapoFlowerIslandA.woff') format('woff');
+  font-weight: normal;
+  font-display: swap;
+}
+
+/* ==== Root vars ==== */
+:root{
+  --card:#151821;
+  --paper-ink:#111;
+}
+
+/* ==== Base ==== */
+html, body { height: 100%; }
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  color:#222;
+  font-family:ui-sans-serif,system-ui,"Noto Sans KR",sans-serif;
+  display:grid; place-items:center;
+}
+
+.container{
+  width:100%; max-width:1080px; padding:24px;
+  display:flex; flex-direction:column; gap:16px;
+}
+
+/* ==== Header & Title ==== */
+header{ display:flex; align-items:center; justify-content:space-between; }
+h1{
+  margin:0;
+  font-family:'Cafe24NyangiWhite','Noto Serif KR',serif;
+  font-size:4rem; font-weight:700; line-height:1.1; letter-spacing:-0.01em;
+}
+
+.title-wrap {
+  display:flex; flex-direction:column; align-items:center;
+}
+.title-icon {
+  width:60px; height:auto; vertical-align:middle; margin-left:10px;
+}
+.title-line {
+  width:110%; height:auto; margin-top:0;
+}
+
+/* ==== BGM toggle ==== */
+#bgmToggle{
+  background:transparent; border:none; padding:6px 8px; cursor:pointer;
+}
+#bgmToggle img{ width:32px; height:32px; display:block; }
+
+/* ==== Book grid ==== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 4px;
+  margin-bottom: 30px;  /* 하단 여백 최소화 */
+  align-items: start;   /* 카드 높이만큼만 공간 차지 */
+}
+
+.cover {
+  width: 66.7%;          /* 카드 자체 크기를 2/3로 축소 */
+  background: var(--card);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .2s ease;
+}
+
+.cover:hover {
+  transform: scale(1.1) translateY(-2px); /* hover 시 1.1배 */
+}
+
+.cover img {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+}
+.meta {
+  padding: 10px 12px;
+  height: 80px;             /* 고정 높이 → 박스 길이 통일 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* 세로 가운데 정렬 */
+  gap: 6px;                 /* 제목과 작가 사이 여백 */
+  background-color: #000;   /* 검은 박스 유지 */
+}
+.title {
+  font-weight: 700;
+  color: #ffffff;           /* 흰색 텍스트 */
+}
+
+.author {
+  color: #c9cfe3;
+  font-size: 0.92rem;
+}
+
+/* ==== Reading stage ==== */
+.stage{ display:flex; flex-direction:column; gap:10px; margin-top:0; }
+.paper{
+  position:relative; width:100%;
+  border-radius:0; min-height:150px; border:none; overflow:hidden;
+}
+.paper-inner{
+  position:absolute; inset:0; padding:28px 32px 36px 32px;
+  display:flex; flex-direction:column; gap:6px; color:var(--paper-ink);
+}
+.book-label{ color:#333; font-size:0.95rem; margin-bottom:0 }
+.sentence{
+  font-size:1.35rem; line-height:1.9; word-break:keep-all; white-space:pre-wrap;
+  color:var(--paper-ink);
+  font-family:'MapoFlowerIsland','Noto Serif KR',serif;
+}
+
+/* ==== Controls ==== */
+.controls{
+  display:flex; gap:12px; align-items:center; justify-content:center; margin-top:8px;
+}
+button{
+  background:#fff; color:#111; border:1px solid #e3e6ef; border-radius:12px;
+  padding:10px 14px; cursor:pointer; font-weight:700; min-width:52px;
+}
+.progress{ color:#6b7280; font-size:0.95rem; min-width:70px; text-align:center; }
+
+/* ==== Footer & textarea ==== */
+.footer-note{
+  margin-top:18px; text-align:center;
+  font-family:'Cafe24NyangiWhite','Noto Serif KR',serif;
+  font-size:2.3rem;
+}
+.write-box{ margin-top:8px; display:flex; justify-content:center; }
+.write-box textarea{
+  width:100%; max-width:1080px; min-height:93px; resize:vertical;
+  padding:14px 16px; border:1px solid #d9dfe9; border-radius:0;
+  font-size:1rem; line-height:1.7; font-family:'MapoFlowerIsland','Noto Serif KR',serif;
+}
+.write-box textarea:focus{
+  border:1px solid #666; outline:none;
+}
+
+/* ==== Rules (lines) ==== */
+.rule{
+  border:none; height:1px; background-color:#999; margin:0;
+}
+
+/* ==== Responsive ==== */
+@media (max-width: 640px){
+  h1{ font-size:2.4rem; }
+}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div class="title-wrap">
+        <h1>Let's read a book! <img src="책1.png" class="title-icon" alt=""></h1>
+        <img src="선.png" class="title-line" alt="제목 밑줄">
+      </div>
+      <button id="bgmToggle" aria-pressed="true" aria-label="배경음악 끄기"></button>
+    </header>
+
+    <section class="grid" id="covers">
+      <div class="cover" data-key="guyi">
+        <img src="구의 증명.jpg" alt="구의 증명 표지" />
+        <div class="meta"><div class="title">구의 증명</div><div class="author">최진영</div></div>
+      </div>
+      <div class="cover" data-key="orbit">
+        <img src="궤도.jpg" alt="궤도의 밖에서, 나의 룸메이트에게 표지" />
+        <div class="meta"><div class="title">궤도의 밖에서, 나의 룸메이트에게</div><div class="author">전삼혜</div></div>
+      </div>
+      <div class="cover" data-key="ghost">
+        <img src="유령의.jpg" alt="유령의 마음으로 표지" />
+        <div class="meta"><div class="title">유령의 마음으로</div><div class="author">임선우</div></div>
+      </div>
+      <div class="cover" data-key="labgirl">
+        <img src="랩걸.jpg" alt="랩걸 표지" />
+        <div class="meta"><div class="title">랩걸</div><div class="author">호프 자런</div></div>
+      </div>
+    </section>
+
+    <section class="stage">
+      <hr class="rule">
+      <div class="paper">
+        <div class="paper-inner">
+          <div class="book-label" id="bookLabel">책을 선택해 주세요</div>
+          <div class="sentence" id="output">…</div>
+        </div>
+      </div>
+      <hr class="rule">
+      <div class="controls">
+        <button id="prevBtn" disabled aria-label="이전 문단">❮</button>
+        <span class="progress" id="progressHint"></span>
+        <button id="nextBtn" disabled aria-label="다음 문단">❯</button>
+      </div>
+    </section>
+
+    <div class="footer-note">Write down your sentence!</div>
+    <div class="write-box">
+      <textarea id="mySentence" placeholder="오늘의 문장을 여기에 적어보세요."></textarea>
+    </div>
+  </main>
+
+  <audio id="bgm" src="배경음악.mp3" preload="auto" loop autoplay playsinline></audio>
+  <audio id="typeSfx" src="글씨.mp3" preload="auto" loop></audio>
+
+  <script>
+  const BOOK_RAW = {
+    guyi: `
+이런저런 생활의 지혜 같은 것은 기가 막히게 잘 알면서도, 자기 삶을 관통하는 아주 결정적인 사실은 모른 채로, 때로는 모른다는 사실조차 모르는 채로도 우리는 그럭저럭 살았던 것이다.
+
+죽으면 알 수 있을까 싶었다. 살아서는 답을 내리지 못한 것들. 죽으면 자연스레 알게 되지 않을까. 그런데 모르겠다. 살아서 몰랐던 건 죽어서도 모른다. 차이가 있다면, 죽은 뒤에는 모른다고 괴로워하지 않는다는 것뿐, 모르는 것은 모르는 대로 두게 된다. 그것 자체로 완성.
+
+사랑한다는 것은 결국 상대를 끝없이 기다린다는 뜻일까.
+
+우리는 사귄다는 단어를 채우고도 그 단어가 보이지 않을 만큼 넘쳐흐르는 관계였다.
+
+어린 날 대부분의 시간을 함께 보내면서, 우리는 같은 것을 보고 듣고 비슷한 감정을 공유했다. 나쁜 짓도 좋은 짓도 부끄러운 짓도 같이 했다. 그러는 동안 우리 마음에는 비슷한 공간이 만들어졌고, 떨어져 있을 때에도 그것은 같은 울림을 만들어냈다.
+
+그것을 뭐라고 불러야 할까. 다만 사랑이라고 할 수는 없지만 사랑에 가까운 감정. 우리 몸에도 마음에도 그것이 들러붙어 있었고, 그것은 죽어서도 사라지지 않을 것이었다.
+
+희망은 해롭다. 그것은 미래니까. 잡을 수 없으니까. 기대와 실망을 동시에 끌어당기니까. 욕심을 만드니까. 신기루 같은 거니까. 이 말을 왜 해주고 싶었냐면, 나는 아무 희망 없이 살면서도 끝까지, 죽는 순간에도 어떻게든 살고 싶었는데, 그건 바로 담이 너 때문에. 희망 없는 세상에선 살 수 있었지만 너 없는 세상에선 살고 싶지가 않아서. 죽음은 너 없는 세상이고 그래서 나는 정말 죽고 싶지 않았어.
+
+다시 태어나 다른 존재로 만난 너를 내가 사랑하게 될까. 다른 존재인 나를 네가 사랑해 줄까. 그 역시 알 수 없다. 나는 내가 사랑하는 너 아닌 그 어떤 너도 상상할 수 없고, 사랑할 자신도 없다. 이승에서 너를 사랑했던 기억, 그 기억을 잃고 싶지 않다. 그러니 이제 내가 바라는 것은, 네가 나를 기억하며 오래도록 살아주기를. 그렇게 오래오래 너를 지켜볼 수 있기를.
+
+언젠가 네가 죽는다면, 그때가 천 년 후라면 좋겠다. 천년토록 살아남아 그 시간만큼 너를 느낄 수 있다면 좋겠다. 나는 이미 죽었으니까. 천만년 만만년도 죽지 않고 기다릴 수 있으니까.
+`,
+    orbit: `
+신은 엿새 동안 세상을 만들고 하루를 쉬었다지. 나는 엿새를 쉰 후에야 겨우 하나의 거짓된 세계를 만들어. 그리고 그 이야기 안에서 나는 너를 세상에서 제일 행복하고 빛나는 사람으로 만들 거야. 안녕. 지워질 이야기는 여기까지만 할게. 그리고 이제 새로운 이야기가 시작될 거야. 너는 나의 세계였으니, 나도 너에게 세계를 줄 거야.
+
+슈, 우리의 궤도가 평행선이 아니어서 다행이야. 평행선이 아니라면 하나쯤은 교차점이 있지. 우리는 그 보육원에서 교차점을 이루었고, 시간이 지나 다시 멀어졌다 해도 교차점이 있었다는 사실은 변하지 않아. 그 교차점이 누군가의 생을 구하기를.
+
+후회하지는 않았다. 다만 마음 안에서, 이미 궤도를 바꿔버렸다고 생각한 감정 하나가 일렁이고 파문을 일으켜 몸을 뒤흔들어 댈 뿐.
+
+기적처럼 너와 내가 다시 아침 인사를 할 수 있기를. 세은은 메세지를 저장하고 부스 안에서 심호흡을 했다. 부스 밖으로 나가기 위해. 최후의 최후까지 싸우기 위해. 뺏기지 말라고, 네가 그랬으니까. 나는 그 말을 평생 잊지 않았어.
+
+무슨 말을 보태야 할까요. 혐오로 가득한 시대를 살아가는 당신과 나에게. 그 혐오 속에서 우리가 서로 연대하고 사랑하는 일이, 지구로 날아오는 소행성의 방향을 비틀고 표면을 깎듯 예전보다 나은 삶을 위한 우리의 최선이라는 것 외에는.
+`,
+    ghost: `
+자꾸만 쏟아질 것 같은 마음을 붙잡으려고 눈을 감았다. 문득 느껴지는 온기에 눈을 뜨자 유령이 내 앞에서 울고 있었다. 나는 유령의 우는 얼굴을 바라보았다. 나에게 도달하지 못한 감정들이 전부 그 안에 머무르고 있었다.  나는 손을 뻗어 유령의 두 눈에서 뚝뚝 떨어지는 눈물을 닦아 주었다. 손에 닿지는 않았지만 분명 따뜻했고, 너무나 따뜻해서, 나는 울 수 있었다.
+
+특별할 것 없던 오후, 유령은 내 어깨에 기대어 있다가 스르르 사라졌다. 사라지기 전, 유령은 내 귀에 대고 무언가를 속삭였다. 그러나 그것은 언어의 형태가 아니었다. 그것은 꿈처럼 아름답고 깃털처럼 부드러운, 물고기처럼 유연하고 흐르는 물처럼 반짝이는 유령의 마음이었다.
+
+산은 이제 울지 않고도 푸르른 냄새가 나는구나. 그 냄새를 맡고 있으니 수로 앞에 서 있는 듯한 기분이 들었다. 흐르는 물을 보지 않고도 시간이 지나가고 있다는 것을 알 것 같은 기분. 산과 나는 이제 슬픈 마음 없이도 누군가를 그리워할 수 있었다.
+
+이야기가 진행될수록 우리는 함께 무언가를 지나가고 있었다. 더디지만 분명한 방향으로, 모난 곳 없이 부드럽게 부풀어 오르는 시간을 지나, 울리는 처음으로 우리가 그리는 목적지에 도달하고 있었다.
+
+동그랗게 만 수건 두 개를 끌어안은 밤, 나는 사랑하는 일은 왜 이렇게 쉬울까, 왜 이렇게 어려울까, 생각하다가 잠이 들었다.
+
+6미터의 눈이 쌓인다면 모든 것이 멈출 거고...... 언제나 분주한 서울도 별수 없이 멈춰 버리겠지. 성철이와 병철이를 잃었을 때 내가 이해할 수 없었던 것은, 세상이 변함없이 흘러간다는 사실이었다. 그때 나는 날이 밝아져 마음이 아팠고, 날이 어두워져 마음이 아팠다. 6미터의 눈이 놀아내릴 때까지만이라도 세상이 멈춘다면, 세상을 용서할 마음이 생길 수도 있을 것이다.
+
+쏟아지는 빛 속에 선 사람들을 바라보며 나는 힘껏 박수를 쳤다. 그러자 이상한 마음이 들었다. 갑자기 모든 것이 그리워질 것만 같았다. 그러니까 수많은 얼굴을, 주말 아침의 영화를, 허공에 포물선을 그리던 야구공을 다시 사랑할 수 있을 것만 같은 기분. 그것들을 마지막으로 떠올려 보기 위해서 나는 눈을 감았다.
+`,
+    labgirl: `
+겨울로 잠수했다가 다시 거기서 빠져나오는 것 자체가 우리의 삶의 추동력이 된 리듬이었다. 어릴 적 나는 이 세상 모든 사람들이 누구나 여름 세상이 죽는 것을 목격하면서, 수없는 얼음의 시련을 견뎌낸 지혜로 언젠가 여름이 다시 부활할 것을 확신하며 살아갈 거라고 믿었다.
+
+몸집은 작지만 결의에 찬 소녀였던 나는 나의 일부만을 사람들에게 보여주는 법을 배우면서도, 나의 본질을 배반하지 않기 위한 혼란스럽고 불안정한 길을 걸었다.
+
+창밖을 보니 캠퍼스가 떠오르는 태양의 첫 햇살을 받아 빛나고 있었다. 다른 어느 누가 나처럼 숨이 멎을 듯한 이 아름다운 여명을 맞고 있을까 생각했다.
+
+우주가 나만을 위해 정해놓은 작은 비밀을 잠깐이나마 손에 쥐고 있었다는, 그 온몸을 압도하는 달콤함은 아무도 앗아갈 수 없었다. 나는 본능적으로 내가 작은 비밀을 손에 쥘 가치가 있는 사람이라면 큰 비밀도 쥘 가치가 있다는 것을 알았다.
+
+오랫동안 그 자리에 앉아서 나는, 자기에게 귀를 기울여주는 것은 녹음기뿐이어서 밤마다 자신의 울부짖음을 녹음해야 했던 이 불쌍한 병든 소녀를 사랑하겠다 맹세한다. 이 으르렁거리는 플라스틱 더미는 이제 죽었지만 여전히 소중하고, 내가 태어나기를 기다리며 어둠 속에서 몸부림칠 때 내게 붙어 있던 태반이었다고 결론짓는다. 안으로 들어가서 새로 이사할 곳에 가져갈 모든 물건들을 상자에 담으면서, 뒤에 남기고 가는 것들에 대해 자신을 용서하려고 노력한다.
+
+우리 모두 일하며 평생을 보내지만 끝까지 하는 일에 정말로 통달하지도, 끝내지도 못한다는 사실은 좀 비극적이라고 나는 생각했다. 그 대신 우리의 목표는 세차게 흐르는 강물로 그가 던진 돌을 내가 딛고 서서 몸을 굽혀 바닥에서 또 하나의 돌을 집어서 좀 더 멀리 던지고, 그 돌이 징검다리가 되어 신의 섭리에 의해 나와 인연이 있는 누군가가 내디딜 다음 발자국에 도움이 되기를 바라는 것이다.
+내가 만나는 사람들의 대부분은 여전히 우리 두 사람 사이의 관계를 한 마디로 표현할 수 있는 라벨을 원한다. 나는 거기에 대한 답을 알지 못한다. 내가 '우리'로 작동하는 것은 내가 그렇게 하는 것밖에 알지 못하기 때문이다.
+
+나는 내가 알아야 할 모든 것을 다 알지 못한다는 사실을 받아들였지만, 동시에 알아야 할 필요가 있는 것은 알고 있다. "널 사랑해" 라는 말을 어떻게 할지는 모르지만 행동으로 어떻게 보여줄지는 안다. 나를 사랑하는 사람들도 마찬가지로 그것을 알고 있다.
+
+나는 어둠 속에서 홀로 앉아 수없는 밤들을 지새웠다. 내 금속 촛불을 태우면서, 그리고 아린 가슴으로 낯선 세상을 지켜보면서 말이다. 오랜 세월을 탐색하며 빚어진 소중한 비밀을 가슴에 품은 사람은 누구나 그렇듯, 나도 누군가에겐가 이 이야기를 하고 싶은 염원을 품고 있었다.
+`
+  };
+
+  // ===== 문단/문장 분리 =====
+  function toParagraphs(raw){
+    const blocks = raw.replace(/\r/g,'').trim().split(/\n\s*\n+/);
+    return blocks.map(b=>b.trim()).filter(Boolean);
+  }
+  function toSentences(rawPara){
+    const m = rawPara.replace(/\n+/g,' ').match(/[^,\.!\?…。，．,。]+(?:[,\.!\?…。，．,。]+)?/g);
+    if (!m) return [];
+    return m.map(s => s.trim()).filter(Boolean);
+  }
+
+  // ===== 오디오 =====
+  const bgm = document.getElementById('bgm');
+  const typeSfx = document.getElementById('typeSfx');
+  const bgmToggle = document.getElementById('bgmToggle');
+
+  bgm.volume = 0.5;
+  typeSfx.volume = 1.0;
+
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    try { await bgm.play(); setBgmUi(true); }
+    catch(e){ setBgmUi(false); }
+  });
+
+  bgmToggle.addEventListener('click', async ()=>{
+    if (bgm.paused) { try { await bgm.play(); setBgmUi(true); } catch(e){} }
+    else { bgm.pause(); setBgmUi(false); }
+  });
+  function setBgmUi(playing){
+    bgmToggle.setAttribute('aria-pressed', playing ? 'true' : 'false');
+    bgmToggle.innerHTML = playing
+      ? '<img src="volume.png" alt="배경음악 켜짐">'
+      : '<img src="mute.png" alt="배경음악 꺼짐">';
+    bgmToggle.setAttribute('aria-label', playing ? '배경음악 끄기' : '배경음악 켜기');
+  }
+
+  // ===== 상태 =====
+  let paragraphs = [];
+  let paragraphIndex = 0;
+  let sentences = [];
+  let sentenceIndex = 0;
+  let typing = false;
+  let typeTimer = null;
+  let playMode = true;
+
+  const output = document.getElementById('output');
+  const bookLabel = document.getElementById('bookLabel');
+  const progressHint = document.getElementById('progressHint');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function setControlsEnabled(on){ [prevBtn, nextBtn].forEach(b => b.disabled = !on); }
+
+  function stopTyping(){
+    typing = false;
+    if (typeTimer){ clearInterval(typeTimer); typeTimer = null; }
+    typeSfx.pause(); typeSfx.currentTime = 0;
+  }
+
+  function updateProgress(){
+    if (!paragraphs.length){ progressHint.textContent = ''; return; }
+    progressHint.textContent = `${paragraphIndex+1}/${paragraphs.length}`;
+  }
+
+  function typeSentence(text, speed=90){
+    stopTyping();
+    typing = true;
+    output.textContent = '';
+    typeSfx.currentTime = 0;
+    typeSfx.loop = true;
+    typeSfx.play().catch(()=>{});
+
+    let i = 0;
+    typeTimer = setInterval(()=>{
+      if (i >= text.length){
+        stopTyping();
+        clearInterval(typeTimer); typeTimer = null;
+        typing = false;
+
+        sentenceIndex++;
+        if (playMode && sentenceIndex < sentences.length){
+          setTimeout(()=> showCurrentSentence(), 400);
+        } else {
+          playMode = false;
+        }
+        return;
+      }
+      output.textContent += text[i++];
+    }, speed);
+  }
+
+  function showCurrentSentence(){
+    if (!sentences.length) return;
+    const text = sentences[Math.min(sentenceIndex, sentences.length - 1)];
+    typeSentence(text);
+  }
+
+  function loadParagraph(idx){
+    paragraphIndex = (idx + paragraphs.length) % paragraphs.length;
+    sentences = toSentences(paragraphs[paragraphIndex]);
+    sentenceIndex = 0;
+    playMode = true;
+    updateProgress();
+    showCurrentSentence();
+  }
+
+  function selectBook(key){
+    const raw = BOOK_RAW[key] || '';
+    paragraphs = toParagraphs(raw);
+
+    if (!paragraphs.length){
+      output.textContent = '본문을 불러오지 못했어요. BOOK_RAW를 확인해 주세요.';
+      setControlsEnabled(false);
+      return;
+    }
+
+    bookLabel.textContent = ({
+      guyi: '구의 증명 · 최진영',
+      orbit: '궤도의 밖에서, 나의 룸메이트에게 · 전삼혜',
+      ghost: '유령의 마음으로 · 임선우',
+      labgirl: '랩걸 · 호프 자런'
+    })[key] || '선택된 책';
+
+    setControlsEnabled(true);
+    loadParagraph(0); // 자동 재생 시작
+  }
+
+  document.getElementById('covers').addEventListener('click', (e)=>{
+    const card = e.target.closest('.cover');
+    if (!card) return;
+    selectBook(card.dataset.key);
+  });
+
+  nextBtn.addEventListener('click', ()=>{
+    if (!paragraphs.length) return;
+    stopTyping();
+    loadParagraph(paragraphIndex + 1);
+  });
+
+  prevBtn.addEventListener('click', ()=>{
+    if (!paragraphs.length) return;
+    stopTyping();
+    loadParagraph(paragraphIndex - 1);
+  });
+
+  const inputBox = document.getElementById('mySentence');
+  let inputSfxTimer = null;
+  inputBox.addEventListener('input', ()=>{
+    try{
+      if (!typing) typeSfx.loop = false;
+      if (typeSfx.paused) { typeSfx.currentTime = 0; typeSfx.play().catch(()=>{}); }
+      clearTimeout(inputSfxTimer);
+      inputSfxTimer = setTimeout(()=>{
+        if (!typing) { typeSfx.pause(); typeSfx.currentTime = 0; }
+      }, 250);
+    }catch(e){}
+  });
+  </script>
+</body>
+</html>
